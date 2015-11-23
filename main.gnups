@@ -1,0 +1,8 @@
+set terminal png
+set output 'eden.png'
+set grid
+set xlabel "x" offset 0,0.5
+set ylabel "y" offset 0.5,0
+set xrange [*:*]
+set yrange [*:*]
+plot 'eden.dat' using 1:2 title 'Eden' with points lt 3 lw 2

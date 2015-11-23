@@ -1,0 +1,8 @@
+gcc main.c -o main -lm
+
+./main
+
+gnuplot main.gnups
+
+open cluster.png
+
