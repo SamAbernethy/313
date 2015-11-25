@@ -15,7 +15,7 @@
 
 void output(FILE *fp_out, int x, int y);
 int pseudorandom(int modulus);
-void updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimeteryvalues[]);
+int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimeteryvalues[]);
 int numberofperimeters(int sites[][EDEN_MAX]);
 
 int main(void)
@@ -98,14 +98,14 @@ int main(void)
     int maxdimension = EDEN_MAX;
     int perimeterxvalues[maxdimension];
     int perimeteryvalues[maxdimension];
-    for (i = 0; i < maxdimension; i++) {
-        perimeterxvalues[i] = 0;
-        perimeteryvalues[i] = 0;
-    }
 
     for (i = 0; i < TRIALS; i++) {
-        updateperimeters(sites, perimeterxvalues, perimeteryvalues);
-        int numb = numberofperimeters(sites);
+        for (j = 0; j < maxdimension; j++) {
+            perimeterxvalues[j] = 0;
+            perimeteryvalues[j] = 0;
+        }
+
+        int numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
         printf("Current number of perimeters: %d\n", numb);
 
         // make a random number from 0 to numb - 1
@@ -121,7 +121,7 @@ int main(void)
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
             if (sites[i][j] == 1) {
-                output(eden_out, i, j);
+                output(eden_out, (i-middle), (j-middle));
                 printf("outputting: %d %d \n", i, j);
             }
         }
@@ -139,7 +139,7 @@ int pseudorandom(int modulus) {
     return r;
 }
 
-void updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimeteryvalues[]) {
+int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimeteryvalues[]) {
     int n = 0;
     int i, j;
     for (i = 0; i < EDEN_MAX; i++ ) {
@@ -170,7 +170,7 @@ void updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimet
             }
         }
     }
-    return;
+    return n;
 }
 
 
