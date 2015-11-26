@@ -6,4 +6,4 @@ gnuplot main.gnups
 
 emacs eden.png &
 
-emacs killer.png
+#emacs killer.png &
