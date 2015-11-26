@@ -11,7 +11,7 @@
 
 #define MAX_ITERATIONS 10
 #define EDEN_MAX 1001
-#define TRIALS 10000
+#define TRIALS 1000
 
 void output(FILE *fp_out, int x, int y);
 int pseudorandom(int modulus);
@@ -142,6 +142,21 @@ int pseudorandom(int modulus) {
 int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimeteryvalues[]) {
     int n = 0;
     int i, j;
+    // New Structure:
+
+    for (i = 1; i < EDEN_MAX-1; i++) {
+        for (j = 1; j < EDEN_MAX-1; j++) {
+            if (  ( (sites[i][j] == 0) || (sites[i][j] == 2) ) && ( (sites[i][j-1] == 1) || (sites[i][j+1] == 1) || (sites[i-1][j] == 1) || (sites[i+1][j] == 1) ) ) {
+                sites[i][j] = 2;
+                perimeterxvalues[n] = i;
+                perimeteryvalues[n] = j;
+                n++;
+            }
+        }
+    }
+
+
+    /* old structure
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
             if ((sites[i][j] == 1) && ((sites[i][j+1] == 0) || (sites[i][j+1] == 2))) {
@@ -169,7 +184,7 @@ int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimete
                 n++;
             }
         }
-    }
+    } */
     return n;
 }
 
