@@ -4,6 +4,6 @@ gcc main.c -o main -lm
 
 gnuplot main.gnups
 
-emacs eden.png &
+#emacs eden.png &
 
 #emacs killer.png &
