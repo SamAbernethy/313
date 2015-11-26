@@ -72,20 +72,13 @@ int main(void)
     srand((unsigned)time(NULL));
     printf("Eden code attempt\n");
     FILE *eden_out;
+    FILE *killer_out;
+    killer_out = fopen("killer.dat", "w");
     eden_out = fopen("eden.dat", "w");
     int middle = (EDEN_MAX - 1) / 2; // EDEN_MAX must be odd
     printf("%d\n", middle);
-    // int *testsites = new int[2000][2000];
     int i, j;
 
-    /*
-    int **sites;
-    sites = malloc(EDEN_MAX * sizeof(int *));
-    for (i = 0; i < EDEN_MAX; i++) {
-        sites[i] = malloc(EDEN_MAX * sizeof(int));
-    }
-
-*/
     int sites[EDEN_MAX][EDEN_MAX];
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
@@ -93,20 +86,35 @@ int main(void)
         }
     }
 
+    int killer[EDEN_MAX][EDEN_MAX];
+    for (i = 0; i < EDEN_MAX; i++ ) {
+        for (j = 0; j < EDEN_MAX; j++ ) {
+            killer[i][j] = 0;
+        }
+    }
+
     sites[middle][middle] = 1;
+    killer[(middle+20)][(middle+20)] = 1;
 
     int maxdimension = EDEN_MAX;
     int perimeterxvalues[maxdimension];
     int perimeteryvalues[maxdimension];
+    int killerperimeterxvalues[maxdimension];
+    int killerperimeteryvalues[maxdimension];
 
     for (i = 0; i < TRIALS; i++) {
         for (j = 0; j < maxdimension; j++) {
             perimeterxvalues[j] = 0;
             perimeteryvalues[j] = 0;
+            killerperimeterxvalues[j] = 0;
+            killerperimeteryvalues[j] = 0;
         }
 
         int numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
         printf("Current number of perimeters: %d\n", numb);
+        int killernumb = updateperimeters(killer, killerperimeterxvalues, killerperimeteryvalues);
+        printf("Number of perimeters for killer: %d\n", killernumb);
+
 
         // make a random number from 0 to numb - 1
         int whichperimeter = pseudorandom(numb);
@@ -116,6 +124,15 @@ int main(void)
         int changingyvalue = perimeteryvalues[whichperimeter];
         sites[changingxvalue][changingyvalue] = 1;
         printf("I just made %d %d a filled data point \n", changingxvalue, changingyvalue);
+
+        // do the same thing for the killer
+        int whichkillerperimeter = pseudorandom(killernumb);
+        printf("KILLER: Random number from 0 to (%d - 1) was %d \n", killernumb, whichkillerperimeter);
+        printf("That means we select the point %d %d \n", killerperimeterxvalues[whichkillerperimeter], killerperimeteryvalues[whichkillerperimeter]);
+        int killerchangingxvalue = killerperimeterxvalues[whichkillerperimeter];
+        int killerchangingyvalue = killerperimeteryvalues[whichkillerperimeter];
+        killer[killerchangingxvalue][killerchangingyvalue] = 1;
+        printf("KILLER: I just made %d %d a filled data point \n", killerchangingxvalue, killerchangingyvalue);
     }
 
     for (i = 0; i < EDEN_MAX; i++ ) {
@@ -123,6 +140,9 @@ int main(void)
             if (sites[i][j] == 1) {
                 output(eden_out, (i-middle), (j-middle));
                 printf("outputting: %d %d \n", i, j);
+            }
+            if (killer[i][j] == 1) {
+                output(killer_out, (i-middle), (j-middle));
             }
         }
     }
@@ -144,8 +164,8 @@ int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimete
     int i, j;
     // New Structure:
 
-    for (i = 1; i < EDEN_MAX-1; i++) {
-        for (j = 1; j < EDEN_MAX-1; j++) {
+    for (i = 1; i < (EDEN_MAX-1); i++) {
+        for (j = 1; j < (EDEN_MAX-1); j++) {
             if (  ( (sites[i][j] == 0) || (sites[i][j] == 2) ) && ( (sites[i][j-1] == 1) || (sites[i][j+1] == 1) || (sites[i-1][j] == 1) || (sites[i+1][j] == 1) ) ) {
                 sites[i][j] = 2;
                 perimeterxvalues[n] = i;
@@ -154,40 +174,8 @@ int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimete
             }
         }
     }
-
-
-    /* old structure
-    for (i = 0; i < EDEN_MAX; i++ ) {
-        for (j = 0; j < EDEN_MAX; j++ ) {
-            if ((sites[i][j] == 1) && ((sites[i][j+1] == 0) || (sites[i][j+1] == 2))) {
-                sites[i][j+1] = 2;
-                perimeterxvalues[n] = i;
-                perimeteryvalues[n] = j + 1;
-                n++;
-            }
-            if ((sites[i][j] == 1) && ((sites[i][j-1] == 0) || (sites[i][j-1] == 2))) {
-                sites[i][j-1] = 2;
-                perimeterxvalues[n] = i;
-                perimeteryvalues[n] = j - 1;
-                n++;
-            }
-            if ((sites[i][j] == 1) && ((sites[i+1][j] == 0) || (sites[i+1][j] == 2))) {
-                sites[i+1][j] = 2;
-                perimeterxvalues[n] = i + 1;
-                perimeteryvalues[n] = j;
-                n++;
-            }
-            if ((sites[i][j] == 1) && ((sites[i-1][j] == 0) || (sites[i-1][j] == 2))) {
-                sites[i-1][j] = 2;
-                perimeterxvalues[n] = i - 1;
-                perimeteryvalues[n] = j;
-                n++;
-            }
-        }
-    } */
     return n;
 }
-
 
 int numberofperimeters(int sites[][EDEN_MAX]) {
     int numberofperimeters = 0;
