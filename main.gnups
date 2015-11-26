@@ -6,5 +6,14 @@ set ylabel "y" offset 0.5,0
 set xrange [*:*]
 set yrange [*:*]
 set size square
-plot 'eden.dat' using 1:2 title 'Eden' with points lt 3 lw 2, \
-'killer.dat' using 1:2 title 'Killer' with points lt 2 lw 4
+plot 'eden.dat' using 1:2 title 'Eden' with points lt 3 lw 2
+
+set terminal png
+set output 'killer.png'
+set grid
+set xlabel "x" offset 0,0.5
+set ylabel "y" offset 0.5,0
+set xrange [*:*]
+set yrange [*:*]
+set size square
+plot 'killer.dat' using 1:2 title 'Killer' with points lt 2 lw 4

@@ -13,7 +13,10 @@
 #define EDEN_MAX 1001
 #define TRIALS 1000
 
-void output(FILE *fp_out, int x, int y);
+void output(int sites[][EDEN_MAX], FILE *fp_out, int middle);
+void initializegrid(int sites[][EDEN_MAX], int xdisp, int ydisp);
+void resetperimetervalues(int perimeterxvalues[], int perimeteryvalues[]);
+void updatecluster(int sites[][EDEN_MAX], int numb, int perimeterxvalues[], int perimeteryvalues[]);
 int pseudorandom(int modulus);
 int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimeteryvalues[]);
 int numberofperimeters(int sites[][EDEN_MAX]);
@@ -76,93 +79,91 @@ int main(void)
     killer_out = fopen("killer.dat", "w");
     eden_out = fopen("eden.dat", "w");
     int middle = (EDEN_MAX - 1) / 2; // EDEN_MAX must be odd
-    printf("%d\n", middle);
     int i, j;
 
     int sites[EDEN_MAX][EDEN_MAX];
+    initializegrid(sites, middle, middle);
+
+    int killer[EDEN_MAX][EDEN_MAX];
+    initializegrid(killer, (middle+20), (middle+20));
+
+    int perimeterxvalues[EDEN_MAX];
+    int perimeteryvalues[EDEN_MAX];
+    int killerperimeterxvalues[EDEN_MAX];
+    int killerperimeteryvalues[EDEN_MAX];
+
+    for (i = 0; i < TRIALS; i++) { // Do this TRIALS times:
+        resetperimetervalues(perimeterxvalues, perimeteryvalues);
+        resetperimetervalues(killerperimeterxvalues, killerperimeteryvalues);
+
+        int numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
+        //printf("Current number of perimeters: %d\n", numb);
+        int killernumb = updateperimeters(killer, killerperimeterxvalues, killerperimeteryvalues);
+        //printf("Number of perimeters for killer: %d\n", killernumb);
+
+        updatecluster(sites, numb, perimeterxvalues, perimeteryvalues);
+        updatecluster(killer, killernumb, killerperimeterxvalues, killerperimeteryvalues);
+    }
+    output(sites, eden_out, middle);
+    output(killer, killer_out, middle);
+    return 0;
+}
+
+// initializes all points to be 0's, except a 1 at a given point
+void initializegrid(int sites[][EDEN_MAX], int xdisp, int ydisp) {
+    int i, j;
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
             sites[i][j] = 0;
         }
     }
+    sites[xdisp][ydisp] = 1;
+}
 
-    int killer[EDEN_MAX][EDEN_MAX];
-    for (i = 0; i < EDEN_MAX; i++ ) {
-        for (j = 0; j < EDEN_MAX; j++ ) {
-            killer[i][j] = 0;
-        }
+// resets all perimeter values to 0
+void resetperimetervalues(int perimeterxvalues[], int perimeteryvalues[]) {
+    int j;
+    for (j = 0; j < EDEN_MAX; j++) {
+        perimeterxvalues[j] = 0;
+        perimeteryvalues[j] = 0;
     }
+}
 
-    sites[middle][middle] = 1;
-    killer[(middle+20)][(middle+20)] = 1;
+// updates the cluster given a randomly chosen perimeter point
+void updatecluster(int sites[][EDEN_MAX], int numb, int perimeterxvalues[], int perimeteryvalues[]) {
+    int whichperimeter = pseudorandom(numb);
+    printf("Random number from 0 to (%d - 1) was %d \n", numb, whichperimeter);
+    printf("That means we select the point %d %d \n", perimeterxvalues[whichperimeter], perimeteryvalues[whichperimeter]);
+    int changingxvalue = perimeterxvalues[whichperimeter];
+    int changingyvalue = perimeteryvalues[whichperimeter];
+    sites[changingxvalue][changingyvalue] = 1;
+    printf("I just made %d %d a filled data point \n", changingxvalue, changingyvalue);
+}
 
-    int maxdimension = EDEN_MAX;
-    int perimeterxvalues[maxdimension];
-    int perimeteryvalues[maxdimension];
-    int killerperimeterxvalues[maxdimension];
-    int killerperimeteryvalues[maxdimension];
-
-    for (i = 0; i < TRIALS; i++) {
-        for (j = 0; j < maxdimension; j++) {
-            perimeterxvalues[j] = 0;
-            perimeteryvalues[j] = 0;
-            killerperimeterxvalues[j] = 0;
-            killerperimeteryvalues[j] = 0;
-        }
-
-        int numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
-        printf("Current number of perimeters: %d\n", numb);
-        int killernumb = updateperimeters(killer, killerperimeterxvalues, killerperimeteryvalues);
-        printf("Number of perimeters for killer: %d\n", killernumb);
-
-
-        // make a random number from 0 to numb - 1
-        int whichperimeter = pseudorandom(numb);
-        printf("Random number from 0 to (%d - 1) was %d \n", numb, whichperimeter);
-        printf("That means we select the point %d %d \n", perimeterxvalues[whichperimeter], perimeteryvalues[whichperimeter]);
-        int changingxvalue = perimeterxvalues[whichperimeter];
-        int changingyvalue = perimeteryvalues[whichperimeter];
-        sites[changingxvalue][changingyvalue] = 1;
-        printf("I just made %d %d a filled data point \n", changingxvalue, changingyvalue);
-
-        // do the same thing for the killer
-        int whichkillerperimeter = pseudorandom(killernumb);
-        printf("KILLER: Random number from 0 to (%d - 1) was %d \n", killernumb, whichkillerperimeter);
-        printf("That means we select the point %d %d \n", killerperimeterxvalues[whichkillerperimeter], killerperimeteryvalues[whichkillerperimeter]);
-        int killerchangingxvalue = killerperimeterxvalues[whichkillerperimeter];
-        int killerchangingyvalue = killerperimeteryvalues[whichkillerperimeter];
-        killer[killerchangingxvalue][killerchangingyvalue] = 1;
-        printf("KILLER: I just made %d %d a filled data point \n", killerchangingxvalue, killerchangingyvalue);
-    }
-
+// outputs from a grid (labelled sites for now)
+void output(int sites[][EDEN_MAX], FILE *fp_out, int middle) {
+    int i, j;
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
             if (sites[i][j] == 1) {
-                output(eden_out, (i-middle), (j-middle));
-                printf("outputting: %d %d \n", i, j);
-            }
-            if (killer[i][j] == 1) {
-                output(killer_out, (i-middle), (j-middle));
+                fprintf(fp_out, "%d\t%d\n", (i-middle), (j-middle));
+                // printf("outputting: %d %d \n", i, j);
             }
         }
     }
-    return 0;
-}
-
-void output(FILE *fp_out, int x, int y) {
-    fprintf(fp_out, "%d\t%d\n", x, y);
     return;
 }
 
+// generates a random number from 0 to (modulus - 1)
 int pseudorandom(int modulus) {
     int r = rand() % modulus;
     return r;
 }
 
+// updates perimeters to be 2s if they have a filled spot nearby
 int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimeteryvalues[]) {
     int n = 0;
     int i, j;
-    // New Structure:
 
     for (i = 1; i < (EDEN_MAX-1); i++) {
         for (j = 1; j < (EDEN_MAX-1); j++) {
