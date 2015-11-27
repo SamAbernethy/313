@@ -9,7 +9,7 @@
 // FUNCTIONS ARE IN MAIN.H
 // ******************************
 
-void checkifperimeter(int DLA_sites[][EDEN_MAX], int randomwalker, int randomwalkery, int dlaperimeterxvalues[], int dlaperimeteryvalues[]);
+int checkifperimeter(int DLA_sites[][EDEN_MAX], int randomwalker, int randomwalkery, int dlaperimeterxvalues[], int dlaperimeteryvalues[]);
 void randomwalk(int DLA_sites[][EDEN_MAX], int randomwalkerx[], int randomwalkery[], int dlaperimeterxvalues[], int dlaperimeteryvalues[]);
 
 void output(int sites[][EDEN_MAX], FILE *fp_out, int middle);
@@ -30,6 +30,20 @@ int main(void)
     // DLA CLUSTER
     // ************************************
 
+    // Pseudocode
+    /* make a grid that is EDEN_MAX by EDEN_MAX
+     *  initialize it to be all 0s, but with a 1 in the very middle
+     * run through TRIALS times, doing:
+     * resetperimetervalues, which sets all perimeter values to be 0s again
+     * update the perimeters which counts and stores all perimeter sites
+     *
+     *
+     *
+     *
+     *
+     * */
+
+
     printf("This is the start of our random walk\n");
 
     FILE *dla_out;
@@ -37,25 +51,23 @@ int main(void)
 
     int DLA_sites[EDEN_MAX][EDEN_MAX];
     initializegrid(DLA_sites, middle, middle);
+
     int dlaperimeterxvalues[EDEN_MAX];
     int dlaperimeteryvalues[EDEN_MAX];
 
     int randomwalkerx[MAX_ITERATIONS];
     int randomwalkery[MAX_ITERATIONS];
 
-    for (i = 0; i < TRIALS; i++) {
+    for (i = 0; i < DLA_TRIALS; i++) {
         resetperimetervalues(dlaperimeterxvalues, dlaperimeteryvalues);
 
         int dlanumber = updateperimeters(DLA_sites, dlaperimeterxvalues, dlaperimeteryvalues);
-        printf("Number of perimeter sites: %d\n", dlanumber);
+        //printf("Number of perimeter sites: %d\n", dlanumber);
 
         randomwalk(DLA_sites, randomwalkerx, randomwalkery, dlaperimeterxvalues, dlaperimeteryvalues);
     }
 
     output(DLA_sites, dla_out, middle);
-
-
-
 
 
     // ****************************************

@@ -1,11 +1,11 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define MAX_ITERATIONS 100000
+#define MAX_ITERATIONS 10000
 #define EDEN_MAX 501 // dimensions of grid for Eden
 #define STRINGLENGTH 25 // maximum number of characters in a string
 #define TRIALS 100 // number of points for Eden
-#define DLA_TRIALS 1000 // number of points for DLA
+#define DLA_TRIALS 100 // number of points for DLA
 
 // *****************************************
 // VARIABLE DECLARATIONS
@@ -18,14 +18,17 @@ int middle = (EDEN_MAX - 1) / 2; // middle of the grid, gets subtracted to cente
 // FUNCTIONS
 // ******************************************
 
-void checkifperimeter(int DLA_sites[][EDEN_MAX], int randomwalkerx, int randomwalkery, int dlaperimeterxvalues[], int dlaperimeteryvalues[]) {
+int checkifperimeter(int DLA_sites[][EDEN_MAX], int randomwalkerx, int randomwalkery, int dlaperimeterxvalues[], int dlaperimeteryvalues[]) {
+    int yesorno = 0;
     int j;
     for (j = 0; j < EDEN_MAX; j++) {
-        if ((randomwalkerx == dlaperimeterxvalues[j]) && (randomwalkery == dlaperimeteryvalues[j])) {
+        if (((randomwalkerx != 0) || (randomwalkery != 0)) && (randomwalkerx == dlaperimeterxvalues[j]) && (randomwalkery == dlaperimeteryvalues[j])) {
             DLA_sites[randomwalkerx][randomwalkery] = 1;
+            //printf("Making %d %d a filled site \n", randomwalkerx, randomwalkery);
+            yesorno = 1;
         }
     }
-    return;
+    return yesorno;
 }
 
 void randomwalk(int DLA_sites[][EDEN_MAX], int randomwalkerx[], int randomwalkery[], int dlaperimeterxvalues[], int dlaperimeteryvalues[]) {
@@ -40,27 +43,37 @@ void randomwalk(int DLA_sites[][EDEN_MAX], int randomwalkerx[], int randomwalker
         randomwalkery[i] = 0;
     }
 
-    for (i = 0; i < MAX_ITERATIONS; i++) {
-        int j = pseudorandom(4);
-        if (j == 0) {
-            x[i] = x[i-1] + 1;
-            y[i] = y[i-1];
+    // starting it at (20,20) for now
+    x[0] = 20;
+    y[0] = 20;
+
+    int foundit = 0;
+    while (foundit == 0) {
+        for (i = 0; i < MAX_ITERATIONS; i++) {
+            int j = pseudorandom(4);
+            if (j == 0) {
+                x[i] = x[i-1] + 1;
+                y[i] = y[i-1];
+            }
+            if (j == 1) {
+                x[i] = x[i-1] - 1;
+                y[i] = y[i-1];
+            }
+            if (j == 2) {
+                x[i] = x[i-1];
+                y[i] = y[i-1] - 1;
+            }
+            if (j == 3) {
+                x[i] = x[i-1];
+                y[i] = y[i-1] + 1;
+            }
+            int tempx = x[i];
+            int tempy = y[i];
+            int a = checkifperimeter(DLA_sites, tempx, tempy, dlaperimeterxvalues, dlaperimeteryvalues);
+            if (a == 1) {
+                foundit = 1;
+            }
         }
-        if (j == 1) {
-            x[i] = x[i-1] - 1;
-            y[i] = y[i-1];
-        }
-        if (j == 2) {
-            x[i] = x[i-1];
-            y[i] = y[i-1] - 1;
-        }
-        if (j == 3) {
-            x[i] = x[i-1];
-            y[i] = y[i-1] + 1;
-        }
-        int tempx = x[i];
-        int tempy = y[i];
-        checkifperimeter(DLA_sites, tempx, tempy, dlaperimeterxvalues, dlaperimeteryvalues);
     }
     return;
 }
@@ -132,6 +145,7 @@ int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimete
                 sites[i][j] = 2;
                 perimeterxvalues[n] = i;
                 perimeteryvalues[n] = j;
+                printf("Perimeter is (%d, %d) \n", i, j);
                 n++;
             }
         }
