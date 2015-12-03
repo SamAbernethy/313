@@ -6,7 +6,7 @@
 #define STRINGLENGTH 25 // maximum number of characters in a string
 #define TRIALS 1000 // number of points for Eden
 #define DLA_TRIALS 10 // number of points for DLA
-#define MAX_TIME 10
+#define MAX_TIME 20
 #define TIME_STEP 1
 
 // *****************************************
@@ -120,16 +120,22 @@ void updatecluster(int sites[][EDEN_MAX], int numb, int perimeterxvalues[], int 
 }
 
 // outputs from a grid (labelled sites for now)
-void output(int sites[][EDEN_MAX], FILE *fp_out, int middle) {
+void output(int sites[][EDEN_MAX], FILE *eden_out, FILE *perimeters_out, int middle) {
     int i, j;
+    int n = 0;
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
             if (sites[i][j] == 1) {
-                fprintf(fp_out, "%d\t%d\n", (i-middle), (j-middle));
+                fprintf(eden_out, "%d\t%d\n", (i-middle), (j-middle));
+                n++;
                 // printf("outputting: %d %d \n", i, j);
+            }
+            if (sites[i][j] == 2) {
+                fprintf(perimeters_out, "%d\t%d\n", (i-middle), (j-middle));
             }
         }
     }
+    printf("Number of lattice points is %d\n", n);
     return;
 }
 
@@ -182,13 +188,13 @@ void massandradius(FILE *dimension_out, int sites[][EDEN_MAX]) {
             }
         }
     }
-    printf("%d", rmax);
+    printf("Maximum radius is %d\n", rmax);
 
-    for (radius = 3; radius <= (rmax/2); radius++) {
+    for (radius = 1; radius <= (rmax/2); radius++) {
         mass = 0;
         for (i = 0; i < EDEN_MAX; i++) {
             for (j = 0; j < EDEN_MAX; j++) {
-                if (((i*i + j*j) <= radius*radius) && (sites[i+middle][j+middle] == 1)) {
+                if (((i*i + j*j) < radius*radius) && (sites[i+middle][j+middle] == 1)) {
                     mass++;
                 }
             }
