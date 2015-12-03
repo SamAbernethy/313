@@ -4,8 +4,10 @@
 #define MAX_ITERATIONS 10000
 #define EDEN_MAX 501 // dimensions of grid for Eden
 #define STRINGLENGTH 25 // maximum number of characters in a string
-#define TRIALS 100 // number of points for Eden
-#define DLA_TRIALS 100 // number of points for DLA
+#define TRIALS 1000 // number of points for Eden
+#define DLA_TRIALS 10 // number of points for DLA
+#define MAX_TIME 10
+#define TIME_STEP 1
 
 // *****************************************
 // VARIABLE DECLARATIONS
@@ -21,11 +23,13 @@ int middle = (EDEN_MAX - 1) / 2; // middle of the grid, gets subtracted to cente
 int checkifperimeter(int DLA_sites[][EDEN_MAX], int randomwalkerx, int randomwalkery, int dlaperimeterxvalues[], int dlaperimeteryvalues[]) {
     int yesorno = 0;
     int j;
-    for (j = 0; j < EDEN_MAX; j++) {
-        if (((randomwalkerx != 0) || (randomwalkery != 0)) && (randomwalkerx == dlaperimeterxvalues[j]) && (randomwalkery == dlaperimeteryvalues[j])) {
-            DLA_sites[randomwalkerx][randomwalkery] = 1;
-            //printf("Making %d %d a filled site \n", randomwalkerx, randomwalkery);
-            yesorno = 1;
+    while (yesorno == 0) {
+        for (j = 0; j < EDEN_MAX; j++) {
+            if (((randomwalkerx != 0) || (randomwalkery != 0)) && (randomwalkerx == dlaperimeterxvalues[j]) && (randomwalkery == dlaperimeteryvalues[j])) {
+                DLA_sites[randomwalkerx][randomwalkery] = 1;
+                printf("Making %d %d a filled site \n", randomwalkerx, randomwalkery);
+                yesorno = 1;
+            }
         }
     }
     return yesorno;
@@ -72,6 +76,7 @@ void randomwalk(int DLA_sites[][EDEN_MAX], int randomwalkerx[], int randomwalker
             int a = checkifperimeter(DLA_sites, tempx, tempy, dlaperimeterxvalues, dlaperimeteryvalues);
             if (a == 1) {
                 foundit = 1;
+                printf("Found one!");
             }
         }
     }
@@ -145,7 +150,7 @@ int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimete
                 sites[i][j] = 2;
                 perimeterxvalues[n] = i;
                 perimeteryvalues[n] = j;
-                printf("Perimeter is (%d, %d) \n", i, j);
+                //printf("Perimeter is (%d, %d) \n", i, j);
                 n++;
             }
         }
@@ -168,7 +173,18 @@ int numberofperimeters(int sites[][EDEN_MAX]) {
 
 void massandradius(FILE *dimension_out, int sites[][EDEN_MAX]) {
     int radius, mass, i, j;
-    for (radius = 2; radius <= 50; radius++) {
+    int rmax = 0;
+
+    for (i = 0; i < EDEN_MAX; i++ ) {
+        for (j = 0; j < EDEN_MAX; j++ ) {
+            if ((sites[i][j] == 1) && (sqrt((i-middle)*(i-middle) + (j-middle)*(j-middle)) > rmax)) {
+                    rmax = sqrt((i-middle)*(i-middle) + (j-middle)*(j-middle));
+            }
+        }
+    }
+    printf("%d", rmax);
+
+    for (radius = 3; radius <= (rmax/2); radius++) {
         mass = 0;
         for (i = 0; i < EDEN_MAX; i++) {
             for (j = 0; j < EDEN_MAX; j++) {
@@ -177,7 +193,7 @@ void massandradius(FILE *dimension_out, int sites[][EDEN_MAX]) {
                 }
             }
         }
-        fprintf(dimension_out, "%d\t%d\n", radius, mass);
+        fprintf(dimension_out, "%lf\t%lf\n", log((double) radius), log((double) mass));
     }
 
 }

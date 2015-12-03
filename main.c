@@ -43,7 +43,7 @@ int main(void)
      *
      * */
 
-
+/*
     printf("This is the start of our random walk\n");
 
     FILE *dla_out;
@@ -62,13 +62,14 @@ int main(void)
         resetperimetervalues(dlaperimeterxvalues, dlaperimeteryvalues);
 
         int dlanumber = updateperimeters(DLA_sites, dlaperimeterxvalues, dlaperimeteryvalues);
-        //printf("Number of perimeter sites: %d\n", dlanumber);
+        printf("Number of perimeter sites: %d\n", dlanumber);
 
         randomwalk(DLA_sites, randomwalkerx, randomwalkery, dlaperimeterxvalues, dlaperimeteryvalues);
+        printf("%d\n", i);
     }
 
     output(DLA_sites, dla_out, middle);
-
+*/
 
     // ****************************************
     // START OF EDEN
@@ -81,7 +82,7 @@ int main(void)
         generate random number from 0 to r-1 and make that 2 point a 1
         repeat!
       */
-/*
+
     printf("Starting Eden Cluster Model: \n");
     FILE *eden_out;
     FILE *killer_out;
@@ -99,11 +100,42 @@ int main(void)
     int killerperimeterxvalues[EDEN_MAX];
     int killerperimeteryvalues[EDEN_MAX];
 
-    for (i = 0; i < TRIALS; i++) { // Do this TRIALS times:
+    // pseduo code for implementing time
+    /* Give it a certain amount of time to run for
+     * a new sites is filled every dt, and it gets faster based on how many particles there are
+     * or based on how many perimeters there are! That could be more interesting
+     *
+     *
+     *
+     *
+     *
+     * */
+
+    int numb;
+    double dt = TIME_STEP;
+    double t = 0;
+    while (t < MAX_TIME) {
         resetperimetervalues(perimeterxvalues, perimeteryvalues);
         resetperimetervalues(killerperimeterxvalues, killerperimeteryvalues);
 
-        int numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
+        numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
+        //printf("Current number of perimeters: %d\n", numb);
+        int killernumb = updateperimeters(killer, killerperimeterxvalues, killerperimeteryvalues);
+        //printf("Number of perimeters for killer: %d\n", killernumb);
+
+        updatecluster(sites, numb, perimeterxvalues, perimeteryvalues);
+        updatecluster(killer, killernumb, killerperimeterxvalues, killerperimeteryvalues);
+
+        dt = (double) TIME_STEP / numb;
+        t = t + dt;
+        printf("Time left is %lf\n", (MAX_TIME - t));
+    }
+
+    /*for (i = 0; i < TRIALS; i++) { // Do this TRIALS times:
+        resetperimetervalues(perimeterxvalues, perimeteryvalues);
+        resetperimetervalues(killerperimeterxvalues, killerperimeteryvalues);
+
+        numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
         //printf("Current number of perimeters: %d\n", numb);
         int killernumb = updateperimeters(killer, killerperimeterxvalues, killerperimeteryvalues);
         //printf("Number of perimeters for killer: %d\n", killernumb);
@@ -113,7 +145,9 @@ int main(void)
         if (i % 100 == 0) { // to see where we are
             printf("At step %d of %d\n", i, TRIALS);
         }
-    }
+    }*/
+
+    printf("number of perimeter sites is %d\n", numb);
     output(sites, eden_out, middle);
     output(killer, killer_out, middle);
 
@@ -122,6 +156,6 @@ int main(void)
 
     // check the dimensionality of the eden cluster
     massandradius(dimension_out, sites);
-    */
+
     return 0;
 }
