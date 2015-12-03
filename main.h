@@ -5,8 +5,7 @@
 #define EDEN_MAX 501 // dimensions of grid for Eden
 #define STRINGLENGTH 25 // maximum number of characters in a string
 #define TRIALS 1000 // number of points for Eden
-#define DLA_TRIALS 10 // number of points for DLA
-#define MAX_TIME 20
+#define MAX_TIME 10
 #define TIME_STEP 1
 
 // *****************************************
@@ -89,14 +88,16 @@ void randomwalk(int DLA_sites[][EDEN_MAX], int randomwalkerx[], int randomwalker
 
 
 // initializes all points to be 0's, except a 1 at a given point
-void initializegrid(int sites[][EDEN_MAX], int xdisp, int ydisp) {
+void initializegrid(int sites[][EDEN_MAX], int xdisp, int ydisp, int whattype) {
     int i, j;
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
             sites[i][j] = 0;
         }
     }
-    sites[xdisp][ydisp] = 1;
+    // 1 for eden
+    // 3 for virus
+    sites[xdisp][ydisp] = whattype;
 }
 
 // resets all perimeter values to 0
@@ -120,12 +121,12 @@ void updatecluster(int sites[][EDEN_MAX], int numb, int perimeterxvalues[], int 
 }
 
 // outputs from a grid (labelled sites for now)
-void output(int sites[][EDEN_MAX], FILE *eden_out, FILE *perimeters_out, int middle) {
+void output(int sites[][EDEN_MAX], FILE *eden_out, FILE *perimeters_out, int middle, int whattype) {
     int i, j;
     int n = 0;
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
-            if (sites[i][j] == 1) {
+            if (sites[i][j] == whattype) {
                 fprintf(eden_out, "%d\t%d\n", (i-middle), (j-middle));
                 n++;
                 // printf("outputting: %d %d \n", i, j);
@@ -135,7 +136,7 @@ void output(int sites[][EDEN_MAX], FILE *eden_out, FILE *perimeters_out, int mid
             }
         }
     }
-    printf("Number of lattice points is %d\n", n);
+    printf("Number of lattice points of type %d is %d\n", whattype, n);
     return;
 }
 
@@ -177,13 +178,13 @@ int numberofperimeters(int sites[][EDEN_MAX]) {
     return numberofperimeters;
 }
 
-void massandradius(FILE *dimension_out, int sites[][EDEN_MAX]) {
+void massandradius(FILE *dimension_out, int sites[][EDEN_MAX], int whattype) {
     int radius, mass, i, j;
     int rmax = 0;
 
     for (i = 0; i < EDEN_MAX; i++ ) {
         for (j = 0; j < EDEN_MAX; j++ ) {
-            if ((sites[i][j] == 1) && (sqrt((i-middle)*(i-middle) + (j-middle)*(j-middle)) > rmax)) {
+            if ((sites[i][j] == whattype) && (sqrt((i-middle)*(i-middle) + (j-middle)*(j-middle)) > rmax)) {
                     rmax = sqrt((i-middle)*(i-middle) + (j-middle)*(j-middle));
             }
         }
@@ -194,7 +195,7 @@ void massandradius(FILE *dimension_out, int sites[][EDEN_MAX]) {
         mass = 0;
         for (i = 0; i < EDEN_MAX; i++) {
             for (j = 0; j < EDEN_MAX; j++) {
-                if (((i*i + j*j) < radius*radius) && (sites[i+middle][j+middle] == 1)) {
+                if (((i*i + j*j) < radius*radius) && (sites[i+middle][j+middle] == whattype)) {
                     mass++;
                 }
             }
@@ -203,5 +204,33 @@ void massandradius(FILE *dimension_out, int sites[][EDEN_MAX]) {
     }
 
 }
+
+void virusattack() {
+    /* slow down by a factor of 10, then take a given virus location and split it into two more viruses
+     * this means make virus[][] be a 3
+     * compare those two virus locations to the sites, and if they match, make sites be 0
+
+
+
+
+
+      */
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 #endif // MAIN_H

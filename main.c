@@ -12,63 +12,20 @@
 int checkifperimeter(int DLA_sites[][EDEN_MAX], int randomwalker, int randomwalkery, int dlaperimeterxvalues[], int dlaperimeteryvalues[]);
 void randomwalk(int DLA_sites[][EDEN_MAX], int randomwalkerx[], int randomwalkery[], int dlaperimeterxvalues[], int dlaperimeteryvalues[]);
 
-void output(int sites[][EDEN_MAX], FILE *eden_out, FILE *perimeters_out, int middle);
-void initializegrid(int sites[][EDEN_MAX], int xdisp, int ydisp);
+void output(int sites[][EDEN_MAX], FILE *eden_out, FILE *perimeters_out, int middle, int whattype);
+void initializegrid(int sites[][EDEN_MAX], int xdisp, int ydisp, int whattype);
 void resetperimetervalues(int perimeterxvalues[], int perimeteryvalues[]);
 void updatecluster(int sites[][EDEN_MAX], int numb, int perimeterxvalues[], int perimeteryvalues[]);
 int pseudorandom(int modulus);
 int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimeteryvalues[]);
 int numberofperimeters(int sites[][EDEN_MAX]);
-void massandradius(FILE *dimension_out, int sites[][EDEN_MAX]);
+void massandradius(FILE *dimension_out, int sites[][EDEN_MAX], int whattype);
+
+void virusattack();
 
 int main(void)
 {
     srand((unsigned)time(NULL)); // seeds the pseudorandom generator
-
-    // ************************************
-    // DLA CLUSTER
-    // ************************************
-
-    // Pseudocode
-    /* make a grid that is EDEN_MAX by EDEN_MAX
-     *  initialize it to be all 0s, but with a 1 in the very middle
-     * run through TRIALS times, doing:
-     * resetperimetervalues, which sets all perimeter values to be 0s again
-     * update the perimeters which counts and stores all perimeter sites
-     *
-     *
-     *
-     *
-     *
-     * */
-
-/*
-    printf("This is the start of our random walk\n");
-
-    FILE *dla_out;
-    dla_out = fopen("dla.dat", "w");
-
-    int DLA_sites[EDEN_MAX][EDEN_MAX];
-    initializegrid(DLA_sites, middle, middle);
-
-    int dlaperimeterxvalues[EDEN_MAX];
-    int dlaperimeteryvalues[EDEN_MAX];
-
-    int randomwalkerx[MAX_ITERATIONS];
-    int randomwalkery[MAX_ITERATIONS];
-
-    for (i = 0; i < DLA_TRIALS; i++) {
-        resetperimetervalues(dlaperimeterxvalues, dlaperimeteryvalues);
-
-        int dlanumber = updateperimeters(DLA_sites, dlaperimeterxvalues, dlaperimeteryvalues);
-        printf("Number of perimeter sites: %d\n", dlanumber);
-
-        randomwalk(DLA_sites, randomwalkerx, randomwalkery, dlaperimeterxvalues, dlaperimeteryvalues);
-        printf("%d\n", i);
-    }
-
-    output(DLA_sites, dla_out, middle);
-*/
 
     // ****************************************
     // START OF EDEN
@@ -88,28 +45,36 @@ int main(void)
      *
      * In version A, a to-be-infected cell is chosen with same probability from all uninfected cells adjacent to the cluster. In version B, an infection path from all possible paths from infected to adjacent uninfected cells is chosen with the same probability (the original Eden model). In version C, firstly a boundary cell of the cluster is randomly chosen, then an uninfected adjacent cell is randomly chosen to be infected. */
 
-
     printf("Starting Eden Cluster Model: \n");
+
+    // Perimeters of Eden
     FILE *perimeters_out;
     perimeters_out = fopen("perimeters.dat", "w");
-    FILE *eden_out;
 
-    FILE *killer_out;
-    killer_out = fopen("killer.dat", "w");
-    FILE *killerperimeters_out;
-    killerperimeters_out = fopen("killerperimeters.dat", "w");
+    // Filled lattice points for Eden
+    FILE *eden_out;
     eden_out = fopen("eden.dat", "w");
 
-    int sites[EDEN_MAX][EDEN_MAX];
-    initializegrid(sites, middle, middle);
+    // filled virus points
+    FILE *virus_out;
+    virus_out = fopen("virus.dat", "w");
 
-    int killer[EDEN_MAX][EDEN_MAX];
-    initializegrid(killer, (middle+10), (middle+10));
+    // virus perimeters
+    FILE *virusperimeters_out;
+    virusperimeters_out = fopen("virusperimeters.dat", "w");
+
+    // initialize sites with a 1 in center
+    int sites[EDEN_MAX][EDEN_MAX];
+    initializegrid(sites, middle, middle, 1);
+
+    // initialize virus with a 3 in center
+    int virus[EDEN_MAX][EDEN_MAX];
+    initializegrid(virus, middle, middle, 3);
 
     int perimeterxvalues[EDEN_MAX];
     int perimeteryvalues[EDEN_MAX];
-    int killerperimeterxvalues[EDEN_MAX];
-    int killerperimeteryvalues[EDEN_MAX];
+    int virusperimeterxvalues[EDEN_MAX];
+    int virusperimeteryvalues[EDEN_MAX];
 
     // pseduo code for implementing time
     /* Give it a certain amount of time to run for
@@ -117,6 +82,18 @@ int main(void)
      * or based on how many perimeters there are! That could be more interesting
      * bacteriophage to kill bacteria from within
      * */
+
+    /* pseudocode for bacteriophage
+     * start with a virus at the origin, just like eden model
+     * have it start out with slower growth, but have it exponentially rise faster
+     * it can only exist where a bacteria WAS (before being killed)
+     * let's say virus can go diagonal too!
+     * give it a 10% factor that slows it down initially, but then it splits into two more
+     * 3s will be virus sites
+     * we'll need a function that compares virus to sites
+     * */
+
+    // eden is 1, eden per is 2, virus is 3, virus per is 4
 
     int numb;
     double dt = TIME_STEP;
@@ -127,26 +104,36 @@ int main(void)
         updatecluster(sites, numb, perimeterxvalues, perimeteryvalues);
         //printf("Current number of perimeters: %d\n", numb);
 
-        // secondary one if needed
-        resetperimetervalues(killerperimeterxvalues, killerperimeteryvalues);
-        int killernumb = updateperimeters(killer, killerperimeterxvalues, killerperimeteryvalues);
-        //printf("Number of perimeters for killer: %d\n", killernumb);
-        updatecluster(killer, killernumb, killerperimeterxvalues, killerperimeteryvalues);
+        /* secondary one if needed
+        resetperimetervalues(virusperimeterxvalues, virusperimeteryvalues);
+        int virusnumb = updateperimeters(virus, virusperimeterxvalues, virusperimeteryvalues);
+        //printf("Number of perimeters for virus: %d\n", virusnumb);
+        updatecluster(virus, virusnumb, virusperimeterxvalues, virusperimeteryvalues);
+        */
+
 
         dt = (double) TIME_STEP / numb;
         t = t + dt;
         printf("Time left is %lf\n", (MAX_TIME - t));
     }
 
+    printf("\n RESULTS: \n\n");
     printf("Number of perimeter sites is %d\n", numb);
-    output(sites, eden_out, perimeters_out, middle);
-    output(killer, killer_out, killerperimeters_out, middle);
+    output(sites, eden_out, perimeters_out, middle, 1);
+    output(virus, virus_out, virusperimeters_out, middle, 3);
 
-    FILE *dimension_out;
-    dimension_out = fopen("dimension.dat", "w");
+
+
+
 
     // check the dimensionality of the eden cluster
-    massandradius(dimension_out, sites);
+    FILE *dimension_out;
+    dimension_out = fopen("dimension.dat", "w");
+    massandradius(dimension_out, sites, 1);
+
+    FILE *virusdim_out;
+    virusdim_out = fopen("virusdim.dat", "w");
+    massandradius(virusdim_out, virus, 3);
 
     return 0;
 }
