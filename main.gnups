@@ -8,7 +8,8 @@ set yrange [*:*]
 set title "Filled Lattice Sites of Eden Cluster"
 set size square
 plot 'eden.dat' using 1:2 title 'Eden' with points pointtype 5, \
-'virus.dat' using 1:2 title 'Virus' with points pointtype 3
+'virus.dat' using 1:2 title 'Virus' with points pointtype 3, \
+'deadcells.dat' using 1:2 title 'Dead Cells' with points pointtype 7
 
 set terminal png
 set output 'perimeters.png'
@@ -40,8 +41,8 @@ plot 'virus.dat' using 1:2 title 'Virus' with points pointtype 5
 #set xrange [*:*]
 #set yrange [*:*]
 #set title "Determining dimensionality of Eden Cluster"
-#f(x) = a*x
-#fit f(x) 'dimension.dat' using 1:2 via a
-#title_f(a) = sprintf('d = %.2f', a)
+#f(x) = a*x + b
+#fit f(x) 'dimension.dat' using 1:2 via a,b
+#title_f(a,b) = sprintf('d = %.2f', a)
 #plot 'dimension.dat' using 1:2 title 'Eden' with points pointtype 5, \
-#f(x) t title_f(a)
+#f(x) t title_f(a,b)

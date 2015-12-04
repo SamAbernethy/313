@@ -22,8 +22,8 @@ int numberofperimeters(int sites[][EDEN_MAX]);
 void massandradius(FILE *dimension_out, int sites[][EDEN_MAX], int whattype);
 
 void virussplit(int virus[][EDEN_MAX], int i, int j, int numberofsplit);
-void Avirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit);
-void Bvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit);
+void Avirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit, int numberofsplit);
+void Bvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit, int numberofsplit);
 void Cvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit);
 
 
@@ -44,9 +44,6 @@ int main(void)
       */
 
     /* background
-     *
-     *
-     *
      * In version A, a to-be-infected cell is chosen with same probability from all uninfected cells adjacent to the cluster. In version B, an infection path from all possible paths from infected to adjacent uninfected cells is chosen with the same probability (the original Eden model). In version C, firstly a boundary cell of the cluster is randomly chosen, then an uninfected adjacent cell is randomly chosen to be infected. */
 
     printf("Starting Eden Cluster Model: \n");
@@ -66,6 +63,10 @@ int main(void)
     // virus perimeters
     FILE *virusperimeters_out;
     virusperimeters_out = fopen("virusperimeters.dat", "w");
+
+    // dead cells
+    FILE *deadcells_out;
+    deadcells_out = fopen("deadcells.dat", "w");
 
     // initialize sites with a 1 in center
     int sites[EDEN_MAX][EDEN_MAX];
@@ -103,22 +104,15 @@ int main(void)
     double dt = TIME_STEP;
     double t = 0;
     while (t < MAX_TIME) {
+        // virus attack with no movement
+        //Avirusattack(virus, sites, 10, 2); // chanceofsplit, number of split
+        Bvirusattack(virus, sites, 20, 2);
+        //Cvirusattack(virus, sites);
+
         resetperimetervalues(perimeterxvalues, perimeteryvalues);
         numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
         updatecluster(sites, numb, perimeterxvalues, perimeteryvalues);
-        //printf("Current number of perimeters: %d\n", numb);
-
-        /* secondary one if needed
-        resetperimetervalues(virusperimeterxvalues, virusperimeteryvalues);
-        int virusnumb = updateperimeters(virus, virusperimeterxvalues, virusperimeteryvalues);
-        //printf("Number of perimeters for virus: %d\n", virusnumb);
-        updatecluster(virus, virusnumb, virusperimeterxvalues, virusperimeteryvalues);
-        */
-
-        Avirusattack(virus, sites, 50); // no movement
-        //Bvirusattack(virus, sites);
-        //Cvirusattack(virus, sites);
-
+        printf("Current number of perimeters: %d\n", numb);
 
         dt = (double) TIME_STEP / numb;
         t = t + dt;
@@ -128,11 +122,8 @@ int main(void)
     printf("\n RESULTS: \n\n");
     printf("Number of perimeter sites is %d\n", numb);
     output(sites, eden_out, perimeters_out, middle, 1);
+    output(sites, deadcells_out, perimeters_out, middle, 10); // deadcells
     output(virus, virus_out, virusperimeters_out, middle, 3);
-
-
-
-
 
     // check the dimensionality of the eden cluster
     FILE *dimension_out;

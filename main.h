@@ -1,15 +1,16 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define EDEN_MAX 501 // dimensions of grid for Eden
+#define EDEN_MAX 1001 // dimensions of grid for Eden
 #define STRINGLENGTH 25 // maximum number of characters in a string
 #define TRIALS 1000 // number of points for Eden
-#define MAX_TIME 20
+#define MAX_TIME 3
 #define TIME_STEP 1
 
 // *****************************************
 // VARIABLE DECLARATIONS
 // *****************************************
+
 int i; // index, usually the x axis of array
 int j; // index, usually the y axis of array
 int middle = (EDEN_MAX - 1) / 2; // middle of the grid, gets subtracted to center at origin
@@ -153,7 +154,7 @@ int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimete
 
     for (i = 1; i < (EDEN_MAX-1); i++) {
         for (j = 1; j < (EDEN_MAX-1); j++) {
-            if (  ( (sites[i][j] == 0) || (sites[i][j] == 2) ) && ( (sites[i][j-1] == 1) || (sites[i][j+1] == 1) || (sites[i-1][j] == 1) || (sites[i+1][j] == 1) ) ) {
+            if (((sites[i][j] == 0) || (sites[i][j] == 2) ) && ( (sites[i][j-1] == 1) || (sites[i][j+1] == 1) || (sites[i-1][j] == 1) || (sites[i+1][j] == 1) ) ) {
                 sites[i][j] = 2;
                 perimeterxvalues[n] = i;
                 perimeteryvalues[n] = j;
@@ -191,11 +192,11 @@ void massandradius(FILE *dimension_out, int sites[][EDEN_MAX], int whattype) {
     }
     printf("Maximum radius is %d\n", rmax);
 
-    for (radius = 1; radius <= (rmax/2); radius++) {
+    for (radius = 2; radius <= (rmax/2); radius++) {
         mass = 0;
         for (i = 0; i < EDEN_MAX; i++) {
             for (j = 0; j < EDEN_MAX; j++) {
-                if (((i*i + j*j) < radius*radius) && (sites[i+middle][j+middle] == whattype)) {
+                if ((((i-middle)*(i-middle) + (j-middle)*(j-middle)) <= radius*radius) && (sites[i][j] == whattype)) {
                     mass++;
                 }
             }
@@ -208,7 +209,7 @@ void virussplit(int virus[][EDEN_MAX], int i, int j, int numberofsplit) {
     int k;
     int movement;
     for (k = 1; k <= numberofsplit; k++) {
-        movement = pseudorandom(5); // can move or stay still
+        movement = pseudorandom(4); // can move or stay still
         if (movement == 0) {
             virus[i-1][j] = 3;
         }
@@ -221,63 +222,69 @@ void virussplit(int virus[][EDEN_MAX], int i, int j, int numberofsplit) {
         else if (movement == 3) {
             virus[i][j+1] = 3;
         }
-        // if movement is 4, it stays still
     }
     return;
 }
 
-void Avirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit) {
+void Avirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit, int numberofsplit) {
     /* slow down by a factor of 10, then take a given virus location and split it into two more viruses
      * this means make virus[][] be a 3
      * compare those two virus locations to the sites, and if they match, make sites be 0
      */
-    int dowesplit; // yes if dowesplit is 0, so chance is 1/chanceofsplit
+    int dowesplit; // yes if dowesplit is 1, so chance is 1/chanceofsplit
     int i, j;
 
     for (i = 0; i < EDEN_MAX; i++) {
         for (j = 0; j < EDEN_MAX; j++) {
             if ((virus[i][j] == 3) && (sites[i][j] == 1)) {
-                // do we split this one?
                 dowesplit = pseudorandom(chanceofsplit);
-                //dowesplit = 0;
-                if (dowesplit == 0) {
-                    virussplit(virus, i, j, 2);
-                    sites[i][j] = 0;
-                    //virus[i][j] = 0;
+                if (dowesplit == 1) {
+                    virussplit(virus, i, j, numberofsplit);
+                    sites[i][j] = 10; // 10 means very dead now
+                    virus[i][j] = 0;
                 }
             }
-
         }
     }
     return;
 }
 
-void Bvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit) {
+void Bvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit, int numberofsplit) {
     int dowesplit;
     int shift;
-    /*else if ((virus[i][j] == 3) && (sites[i][j] != 1)) {
-        shift = pseudorandom(100);
-        // if 4, don't move
-        if (shift == 0) {
-            virus[i-1][j] = 3;
-            virus[i][j] = 0;
+    int i, j;
+    for (i = 0; i < EDEN_MAX; i++) {
+        for (j = 0; j < EDEN_MAX; j++) {
+            if ((virus[i][j] == 3) && (sites[i][j] == 1)) {
+                dowesplit = pseudorandom(chanceofsplit);
+                if (dowesplit == 1) {
+                    virussplit(virus, i, j, numberofsplit);
+                    sites[i][j] = 10; // 10 means dead, no bacteria can go there
+                    virus[i][j] = 0;
+                }
+            }
+            else if ((virus[i][j] == 3) && (sites[i][j] != 1)) {
+                shift = pseudorandom(100);
+                // if 4, don't move
+                if (shift == 0) {
+                    virus[i-1][j] = 3;
+                    virus[i][j] = 0;
+                }
+                if (shift == 1) {
+                    virus[i+1][j] = 3;
+                    virus[i][j] = 0;
+                }
+                if (shift == 2) {
+                    virus[i][j-1] = 3;
+                    virus[i][j] = 0;
+                }
+                if (shift == 3) {
+                    virus[i][j+1] = 3;
+                    virus[i][j] = 0;
+                }
+            }
         }
-        if (shift == 1) {
-            virus[i+1][j] = 3;
-            virus[i][j] = 0;
-        }
-        if (shift == 2) {
-            virus[i][j-1] = 3;
-            virus[i][j] = 0;
-        }
-        if (shift == 3) {
-            virus[i][j+1] = 3;
-            virus[i][j] = 0;
-        }
-    }*/
-
-
-
+    }
     return;
 }
 

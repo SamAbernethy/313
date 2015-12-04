@@ -6,6 +6,8 @@ gnuplot main.gnups
 
 emacs eden.png &
 
-#emacs perimeters.png &
+emacs perimeters.png &
 
 #emacs virus.png &
+
+#emacs dimension.png &
