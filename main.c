@@ -21,7 +21,7 @@ int updateperimeters(int sites[][EDEN_MAX], int perimeterxvalues[], int perimete
 int numberofperimeters(int sites[][EDEN_MAX]);
 void massandradius(FILE *dimension_out, int sites[][EDEN_MAX], int whattype);
 
-void virusattack();
+void virusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX]   );
 
 int main(void)
 {
@@ -111,6 +111,7 @@ int main(void)
         updatecluster(virus, virusnumb, virusperimeterxvalues, virusperimeteryvalues);
         */
 
+        virusattack(virus, sites);
 
         dt = (double) TIME_STEP / numb;
         t = t + dt;

@@ -2,10 +2,10 @@
 #define MAIN_H
 
 #define MAX_ITERATIONS 10000
-#define EDEN_MAX 501 // dimensions of grid for Eden
+#define EDEN_MAX 1001 // dimensions of grid for Eden
 #define STRINGLENGTH 25 // maximum number of characters in a string
 #define TRIALS 1000 // number of points for Eden
-#define MAX_TIME 10
+#define MAX_TIME 20
 #define TIME_STEP 1
 
 // *****************************************
@@ -19,7 +19,7 @@ int middle = (EDEN_MAX - 1) / 2; // middle of the grid, gets subtracted to cente
 // FUNCTIONS
 // ******************************************
 
-int checkifperimeter(int DLA_sites[][EDEN_MAX], int randomwalkerx, int randomwalkery, int dlaperimeterxvalues[], int dlaperimeteryvalues[]) {
+/*int checkifperimeter(int DLA_sites[][EDEN_MAX], int randomwalkerx, int randomwalkery, int dlaperimeterxvalues[], int dlaperimeteryvalues[]) {
     int yesorno = 0;
     int j;
     while (yesorno == 0) {
@@ -81,6 +81,7 @@ void randomwalk(int DLA_sites[][EDEN_MAX], int randomwalkerx[], int randomwalker
     }
     return;
 }
+*/
 
 // ********************************************
 // FUNCTIONS USED BY EDEN
@@ -202,32 +203,96 @@ void massandradius(FILE *dimension_out, int sites[][EDEN_MAX], int whattype) {
         }
         fprintf(dimension_out, "%lf\t%lf\n", log((double) radius), log((double) mass));
     }
-
 }
 
-void virusattack() {
+void virusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX]) {
     /* slow down by a factor of 10, then take a given virus location and split it into two more viruses
      * this means make virus[][] be a 3
      * compare those two virus locations to the sites, and if they match, make sites be 0
+     */
+    int dowesplit, movement, movement2; // yes if dowesplit is 0
+    int shift;
 
+    // starts with a 3 at center
+    int i, j;
 
+    for (i = 0; i < EDEN_MAX; i++) {
+        for (j = 0; j < EDEN_MAX; j++) {
+            if ((virus[i][j] == 3) && (sites[i][j] == 1)) {
+                sites[i][j] = 0;
 
-
-
-      */
-
-
+                // do we split this one?
+                dowesplit = pseudorandom(10);
+                //dowesplit = 0;
+                if (dowesplit == 0) {
+                    movement = pseudorandom(4);
+                    if (movement == 0) {
+                        virus[i-1][j] = 3;
+                        //sites[i-1][j] = 0;
+                        printf("moved left");
+                    }
+                    if (movement == 1) {
+                        virus[i+1][j] = 3;
+                        //sites[i+1][j] = 0;
+                        printf("moved right");
+                    }
+                    if (movement == 2) {
+                        virus[i][j-1] = 3;
+                        //sites[i][j-1] = 0;
+                        printf("moved down");
+                    }
+                    if (movement == 3) {
+                        virus[i][j+1] = 3;
+                        //sites[i][j+1] = 0;
+                        printf("moved up");
+                    }
+                    movement2 = pseudorandom(4);
+                    if (movement2 == 0) {
+                        virus[i-1][j] = 3;
+                        //sites[i-1][j] = 0;
+                        printf("moved left");
+                    }
+                    if (movement2 == 1) {
+                        virus[i+1][j] = 3;
+                        //sites[i+1][j] = 0;
+                        printf("moved right");
+                    }
+                    if (movement2 == 2) {
+                        virus[i][j-1] = 3;
+                        //sites[i][j-1] = 0;
+                        printf("moved down");
+                    }
+                    if (movement2 == 3) {
+                        virus[i][j+1] = 3;
+                        //sites[i][j+1] = 0;
+                        printf("moved up");
+                    }
+                    //virus[i][j] = 0;
+                }
+            }
+            else if ((virus[i][j] == 3) && (sites[i][j] != 1)) {
+                shift = pseudorandom(100);
+                // if 4, don't move
+                if (shift == 0) {
+                    virus[i-1][j] = 3;
+                    virus[i][j] = 0;
+                }
+                if (shift == 1) {
+                    virus[i+1][j] = 3;
+                    virus[i][j] = 0;
+                }
+                if (shift == 2) {
+                    virus[i][j-1] = 3;
+                    virus[i][j] = 0;
+                }
+                if (shift == 3) {
+                    virus[i][j+1] = 3;
+                    virus[i][j] = 0;
+                }
+            }
+        }
+    }
 }
-
-
-
-
-
-
-
-
-
-
 
 
 
