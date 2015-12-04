@@ -32,7 +32,6 @@ set title "Virus Attack"
 set size square
 plot 'virus.dat' using 1:2 title 'Virus' with points pointtype 5
 
-
 #set terminal png
 #set output 'dimension.png'
 #set grid

@@ -1,8 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-#define MAX_ITERATIONS 10000
-#define EDEN_MAX 1001 // dimensions of grid for Eden
+#define EDEN_MAX 501 // dimensions of grid for Eden
 #define STRINGLENGTH 25 // maximum number of characters in a string
 #define TRIALS 1000 // number of points for Eden
 #define MAX_TIME 20
@@ -205,93 +204,91 @@ void massandradius(FILE *dimension_out, int sites[][EDEN_MAX], int whattype) {
     }
 }
 
-void virusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX]) {
+void virussplit(int virus[][EDEN_MAX], int i, int j, int numberofsplit) {
+    int k;
+    int movement;
+    for (k = 1; k <= numberofsplit; k++) {
+        movement = pseudorandom(5); // can move or stay still
+        if (movement == 0) {
+            virus[i-1][j] = 3;
+        }
+        else if (movement == 1) {
+            virus[i+1][j] = 3;
+        }
+        else if (movement == 2) {
+            virus[i][j-1] = 3;
+        }
+        else if (movement == 3) {
+            virus[i][j+1] = 3;
+        }
+        // if movement is 4, it stays still
+    }
+    return;
+}
+
+void Avirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit) {
     /* slow down by a factor of 10, then take a given virus location and split it into two more viruses
      * this means make virus[][] be a 3
      * compare those two virus locations to the sites, and if they match, make sites be 0
      */
-    int dowesplit, movement, movement2; // yes if dowesplit is 0
-    int shift;
-
-    // starts with a 3 at center
+    int dowesplit; // yes if dowesplit is 0, so chance is 1/chanceofsplit
     int i, j;
 
     for (i = 0; i < EDEN_MAX; i++) {
         for (j = 0; j < EDEN_MAX; j++) {
             if ((virus[i][j] == 3) && (sites[i][j] == 1)) {
-                sites[i][j] = 0;
-
                 // do we split this one?
-                dowesplit = pseudorandom(10);
+                dowesplit = pseudorandom(chanceofsplit);
                 //dowesplit = 0;
                 if (dowesplit == 0) {
-                    movement = pseudorandom(4);
-                    if (movement == 0) {
-                        virus[i-1][j] = 3;
-                        //sites[i-1][j] = 0;
-                        printf("moved left");
-                    }
-                    if (movement == 1) {
-                        virus[i+1][j] = 3;
-                        //sites[i+1][j] = 0;
-                        printf("moved right");
-                    }
-                    if (movement == 2) {
-                        virus[i][j-1] = 3;
-                        //sites[i][j-1] = 0;
-                        printf("moved down");
-                    }
-                    if (movement == 3) {
-                        virus[i][j+1] = 3;
-                        //sites[i][j+1] = 0;
-                        printf("moved up");
-                    }
-                    movement2 = pseudorandom(4);
-                    if (movement2 == 0) {
-                        virus[i-1][j] = 3;
-                        //sites[i-1][j] = 0;
-                        printf("moved left");
-                    }
-                    if (movement2 == 1) {
-                        virus[i+1][j] = 3;
-                        //sites[i+1][j] = 0;
-                        printf("moved right");
-                    }
-                    if (movement2 == 2) {
-                        virus[i][j-1] = 3;
-                        //sites[i][j-1] = 0;
-                        printf("moved down");
-                    }
-                    if (movement2 == 3) {
-                        virus[i][j+1] = 3;
-                        //sites[i][j+1] = 0;
-                        printf("moved up");
-                    }
+                    virussplit(virus, i, j, 2);
+                    sites[i][j] = 0;
                     //virus[i][j] = 0;
                 }
             }
-            else if ((virus[i][j] == 3) && (sites[i][j] != 1)) {
-                shift = pseudorandom(100);
-                // if 4, don't move
-                if (shift == 0) {
-                    virus[i-1][j] = 3;
-                    virus[i][j] = 0;
-                }
-                if (shift == 1) {
-                    virus[i+1][j] = 3;
-                    virus[i][j] = 0;
-                }
-                if (shift == 2) {
-                    virus[i][j-1] = 3;
-                    virus[i][j] = 0;
-                }
-                if (shift == 3) {
-                    virus[i][j+1] = 3;
-                    virus[i][j] = 0;
-                }
-            }
+
         }
     }
+    return;
+}
+
+void Bvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit) {
+    int dowesplit;
+    int shift;
+    /*else if ((virus[i][j] == 3) && (sites[i][j] != 1)) {
+        shift = pseudorandom(100);
+        // if 4, don't move
+        if (shift == 0) {
+            virus[i-1][j] = 3;
+            virus[i][j] = 0;
+        }
+        if (shift == 1) {
+            virus[i+1][j] = 3;
+            virus[i][j] = 0;
+        }
+        if (shift == 2) {
+            virus[i][j-1] = 3;
+            virus[i][j] = 0;
+        }
+        if (shift == 3) {
+            virus[i][j+1] = 3;
+            virus[i][j] = 0;
+        }
+    }*/
+
+
+
+    return;
+}
+
+void Cvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit) {
+    int dowesplit;
+
+
+
+
+
+    return;
 }
 
 
