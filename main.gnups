@@ -8,8 +8,8 @@ set yrange [*:*]
 set title "Filled Lattice Sites of Eden Cluster"
 set size square
 plot 'eden.dat' using 1:2 title 'Eden' with points pointtype 5, \
-'virus.dat' using 1:2 title 'Virus' with points pointtype 3, \
-'deadcells.dat' using 1:2 title 'Dead Cells' with points pointtype 7
+'virus.dat' using 1:2 title 'Virus' with points pointtype 1, \
+'deadcells.dat' using 1:2 title 'Dead Cells' with points pointtype 2
 
 set terminal png
 set output 'perimeters.png'

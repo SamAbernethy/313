@@ -22,9 +22,9 @@ int numberofperimeters(int sites[][EDEN_MAX]);
 void massandradius(FILE *dimension_out, int sites[][EDEN_MAX], int whattype);
 
 void virussplit(int virus[][EDEN_MAX], int i, int j, int numberofsplit);
-void Avirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit, int numberofsplit);
-void Bvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit, int numberofsplit);
-void Cvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit);
+void NoMoveVirus(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit, int numberofsplit);
+void MoveVirus(int virus[][EDEN_MAX], int sites[][EDEN_MAX], int chanceofsplit, int numberofsplit, int chanceofmovement);
+void Cvirusattack(int virus[][EDEN_MAX], int sites[][EDEN_MAX]);
 
 
 int main(void)
@@ -98,19 +98,32 @@ int main(void)
      * we'll need a function that compares virus to sites
      * */
 
-    // eden is 1, eden per is 2, virus is 3, virus per is 4
+    // eden is 1, eden per is 2, virus is 3, dead is 10
 
     int numb;
     double dt = TIME_STEP;
     double t = 0;
     while (t < MAX_TIME) {
         // virus attack with no movement
-        //Avirusattack(virus, sites, 10, 2); // chanceofsplit, number of split
-        Bvirusattack(virus, sites, 20, 2);
-        //Cvirusattack(virus, sites);
+        //NoMoveVirus(virus, sites, 10, 2); // chanceofsplit, number of split
+
+        // virus attack with movement
+        //MoveVirus(virus, sites, 10, 2, 1000);
+        // chanceofsplit, number of split, chance of movement
+
+        int introducedtime = 10;
+        // killer virus attack
+        if (t > introducedtime) {
+            Cvirusattack(virus, sites);
+        }
 
         resetperimetervalues(perimeterxvalues, perimeteryvalues);
         numb = updateperimeters(sites, perimeterxvalues, perimeteryvalues);
+        if (numb == 0) {
+            printf("Time until death of bacteria was %lf\n", t);
+            printf("Virus was introduced at time %d\n", introducedtime);
+            break;
+        }
         updatecluster(sites, numb, perimeterxvalues, perimeteryvalues);
         printf("Current number of perimeters: %d\n", numb);
 
