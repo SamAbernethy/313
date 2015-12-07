@@ -1,12 +1,18 @@
 gcc main.c -o main -lm
 
-./main
+./main < main.in
 
 gnuplot main.gnups
 
 emacs eden.png &
 
-emacs perimeters.png &
+emacs thirdeden.png &
+
+emacs twothirdseden.png &
+
+emacs size.png &
+
+#emacs perimeters.png &
 
 #emacs virus.png &
 

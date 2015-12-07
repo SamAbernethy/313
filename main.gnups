@@ -1,3 +1,4 @@
+#PLOTTING EDEN CLUSTER
 set terminal png
 set output 'eden.png'
 set grid
@@ -11,28 +12,59 @@ plot 'eden.dat' using 1:2 title 'Eden' with points pointtype 5, \
 'virus.dat' using 1:2 title 'Virus' with points pointtype 1, \
 'deadcells.dat' using 1:2 title 'Dead Cells' with points pointtype 2
 
+#PLOTTING EDEN CLUSTER AFTER 1/3 TIME
 set terminal png
-set output 'perimeters.png'
+set output 'thirdeden.png'
 set grid
 set xlabel "x" offset 0,0.5
 set ylabel "y" offset 0.5,0
 set xrange [*:*]
 set yrange [*:*]
-set title "Perimeters of Eden Cluster"
+set title "Filled Lattice Sites of Eden Cluster (1/3 of max time)"
 set size square
-plot 'perimeters.dat' using 1:2 title 'Perimeters' with points pointtype 5
+plot 'thirdeden.dat' using 1:2 title 'Eden' with points pointtype 5, \
+'thirdvirus.dat' using 1:2 title 'Virus' with points pointtype 1, \
+'thirddeadcells.dat' using 1:2 title 'Dead Cells' with points pointtype 2
 
+#PLOTTING EDEN CLUSTER AFTER 2/3 TIME
 set terminal png
-set output 'virus.png'
+set output 'twothirdseden.png'
 set grid
 set xlabel "x" offset 0,0.5
-set ylabel "y" offset 0.5, 0
+set ylabel "y" offset 0.5,0
 set xrange [*:*]
 set yrange [*:*]
-set title "Virus Attack"
+set title "Filled Lattice Sites of Eden Cluster (2/3 of max time)"
 set size square
-plot 'virus.dat' using 1:2 title 'Virus' with points pointtype 5
+plot 'twothirdseden.dat' using 1:2 title 'Eden' with points pointtype 5, \
+'twothirdsvirus.dat' using 1:2 title 'Virus' with points pointtype 1, \
+'twothirdsdeadcells.dat' using 1:2 title 'Dead Cells' with points pointtype 2
 
+#PLOTTING SIZE OF CLUSTER OVER TIME
+set terminal png
+set output 'size.png'
+set grid
+set xlabel "Time (arbitrary units)" offset 0,0.5
+set ylabel "Number of Filled Cluster Sites" offset 0.5,0
+set xrange [*:*]
+set yrange [*:*]
+set title "Tracking Cluster Size"
+set size square
+plot 'size.dat' using 1:2 notitle with points pointtype 5
+
+#PLOTTING PERIMETER SITES OF CLUSTER
+#set terminal png
+#set output 'perimeters.png'
+#set grid
+#set xlabel "x" offset 0,0.5
+#set ylabel "y" offset 0.5,0
+#set xrange [*:*]
+#set yrange [*:*]
+#set title "Perimeters of Eden Cluster"
+#set size square
+#plot 'perimeters.dat' using 1:2 title 'Perimeters' with points pointtype 5
+
+#DETERMINING DIMENSIONALITY OF CLUSTER
 #set terminal png
 #set output 'dimension.png'
 #set grid
